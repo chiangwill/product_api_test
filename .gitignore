@@ -1,0 +1,3 @@
+.pytest_cache/
+reports/report.html
+api_test.log

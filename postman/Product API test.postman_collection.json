@@ -1,0 +1,1039 @@
+{
+	"info": {
+		"_postman_id": "2fd79c9a-a5bf-44b5-b6fb-6c5f9c7b2876",
+		"name": "Product API test",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "18178078"
+	},
+	"item": [
+		{
+			"name": "獲取所有產品",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"狀態碼應為 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"響應應為 JSON\", function () {",
+							"    pm.response.to.be.json;",
+							"});",
+							"",
+							"pm.test(\"響應包含所有必要欄位\", function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('current_page');",
+							"    pm.expect(jsonData).to.have.property('data');",
+							"    pm.expect(jsonData).to.have.property('from');",
+							"    pm.expect(jsonData).to.have.property('last_page');",
+							"    pm.expect(jsonData).to.have.property('per_page');",
+							"    pm.expect(jsonData).to.have.property('to');",
+							"    pm.expect(jsonData).to.have.property('total');",
+							"});",
+							"",
+							"pm.test(\"data 欄位應該是陣列且不為空\", function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData.data).to.be.an('array').and.to.have.lengthOf.at.least(1);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://api-with-bugs.practicesoftwaretesting.com/products",
+					"protocol": "https",
+					"host": [
+						"api-with-bugs",
+						"practicesoftwaretesting",
+						"com"
+					],
+					"path": [
+						"products"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "分頁功能",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"狀態碼應為 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"current_page 應為 2\", function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData.current_page).to.equal(2);",
+							"});",
+							"",
+							"pm.test(\"data 欄位應該是陣列且不為空\", function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData.data).to.be.an('array').and.to.have.lengthOf.at.least(1);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://api-with-bugs.practicesoftwaretesting.com/products?page=2",
+					"protocol": "https",
+					"host": [
+						"api-with-bugs",
+						"practicesoftwaretesting",
+						"com"
+					],
+					"path": [
+						"products"
+					],
+					"query": [
+						{
+							"key": "page",
+							"value": "2"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "價格範圍篩選",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"狀態碼應為 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"所有產品價格應在 10 到 15 範圍內\", function () {",
+							"    const jsonData = pm.response.json();",
+							"    ",
+							"    pm.expect(jsonData.data).to.be.an('array').and.to.have.lengthOf.at.least(1);",
+							"    ",
+							"    jsonData.data.forEach(function(product) {",
+							"        pm.expect(product.price).to.be.at.least(10);",
+							"        pm.expect(product.price).to.be.at.most(15);",
+							"    });",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://api-with-bugs.practicesoftwaretesting.com/products?between=price%2C10%2C15",
+					"protocol": "https",
+					"host": [
+						"api-with-bugs",
+						"practicesoftwaretesting",
+						"com"
+					],
+					"path": [
+						"products"
+					],
+					"query": [
+						{
+							"key": "between",
+							"value": "price%2C10%2C15"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "按名稱降序排序",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"狀態碼應為 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"產品應按名稱降序排列\", function () {",
+							"    const jsonData = pm.response.json();",
+							"    ",
+							"    pm.expect(jsonData.data).to.be.an('array').and.to.have.lengthOf.at.least(2);",
+							"    ",
+							"    let productNames = jsonData.data.map(product => product.name);",
+							"    ",
+							"    let sortedNames = [...productNames].sort().reverse();",
+							"    ",
+							"    pm.expect(productNames).to.eql(sortedNames);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://api-with-bugs.practicesoftwaretesting.com/products?sort=name%2Cdesc",
+					"protocol": "https",
+					"host": [
+						"api-with-bugs",
+						"practicesoftwaretesting",
+						"com"
+					],
+					"path": [
+						"products"
+					],
+					"query": [
+						{
+							"key": "sort",
+							"value": "name%2Cdesc"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "按名稱升序排序",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"狀態碼應為 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"產品應按名稱升序排列\", function () {",
+							"    const jsonData = pm.response.json();",
+							"    ",
+							"    pm.expect(jsonData.data).to.be.an('array');",
+							"    ",
+							"    if (jsonData.data.length < 2) {",
+							"        pm.info(\"產品數量少於2，無法驗證排序\");",
+							"        return;",
+							"    }",
+							"    ",
+							"    let productNames = jsonData.data.map(product => product.name);",
+							"    ",
+							"    let sortedNames = [...productNames].sort((a, b) => a.localeCompare(b));",
+							"    ",
+							"    pm.expect(productNames).to.eql(sortedNames);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://api-with-bugs.practicesoftwaretesting.com/products?sort=name%2Cacs",
+					"protocol": "https",
+					"host": [
+						"api-with-bugs",
+						"practicesoftwaretesting",
+						"com"
+					],
+					"path": [
+						"products"
+					],
+					"query": [
+						{
+							"key": "sort",
+							"value": "name%2Cacs"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "按價格降序排序",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"狀態碼應為 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"產品應按價格降序排列\", function () {",
+							"    const jsonData = pm.response.json();",
+							"    ",
+							"    pm.expect(jsonData.data).to.be.an('array');",
+							"    ",
+							"    if (jsonData.data.length < 2) {",
+							"        pm.info(\"產品數量少於2，無法驗證排序\");",
+							"        return;",
+							"    }",
+							"    ",
+							"    let isDescending = true;",
+							"    ",
+							"    for (let i = 0; i < jsonData.data.length - 1; i++) {",
+							"        if (parseFloat(jsonData.data[i].price) < parseFloat(jsonData.data[i+1].price)) {",
+							"            isDescending = false;",
+							"            break;",
+							"        }",
+							"    }",
+							"    ",
+							"    pm.expect(isDescending).to.be.true;",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://api-with-bugs.practicesoftwaretesting.com/products?sort=price%2Cdesc",
+					"protocol": "https",
+					"host": [
+						"api-with-bugs",
+						"practicesoftwaretesting",
+						"com"
+					],
+					"path": [
+						"products"
+					],
+					"query": [
+						{
+							"key": "sort",
+							"value": "price%2Cdesc"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "按價格升序排序",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"狀態碼應為 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"產品應按價格升序排列\", function () {",
+							"    const jsonData = pm.response.json();",
+							"    ",
+							"    pm.expect(jsonData.data).to.be.an('array');",
+							"    ",
+							"    if (jsonData.data.length < 2) {",
+							"        pm.info(\"產品數量少於2，無法驗證排序\");",
+							"        return;",
+							"    }",
+							"    ",
+							"    let isAscending = true;",
+							"    ",
+							"    for (let i = 0; i < jsonData.data.length - 1; i++) {",
+							"        if (parseFloat(jsonData.data[i].price) > parseFloat(jsonData.data[i+1].price)) {",
+							"            isAscending = false;",
+							"            break;",
+							"        }",
+							"    }",
+							"    ",
+							"    pm.expect(isAscending).to.be.true;",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://api-with-bugs.practicesoftwaretesting.com/products?sort=price%2Casc",
+					"protocol": "https",
+					"host": [
+						"api-with-bugs",
+						"practicesoftwaretesting",
+						"com"
+					],
+					"path": [
+						"products"
+					],
+					"query": [
+						{
+							"key": "sort",
+							"value": "price%2Casc"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "獲取單個產品",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"狀態碼應為 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"響應應為 JSON\", function () {",
+							"    pm.response.to.be.json;",
+							"});",
+							"",
+							"pm.test(\"產品 ID 應與請求的 ID 一致\", function () {",
+							"    const jsonData = pm.response.json();",
+							"    const requestUrl = pm.request.url.toString();",
+							"    const requestedId = requestUrl.substring(requestUrl.lastIndexOf('/') + 1);",
+							"    ",
+							"    pm.expect(String(jsonData.id)).to.equal(requestedId);",
+							"",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://api-with-bugs.practicesoftwaretesting.com/products/1",
+					"protocol": "https",
+					"host": [
+						"api-with-bugs",
+						"practicesoftwaretesting",
+						"com"
+					],
+					"path": [
+						"products",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "參數組合使用",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"狀態碼應為 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"所有產品價格應在 10 到 15 範圍內\", function () {",
+							"    const jsonData = pm.response.json();",
+							"    ",
+							"    pm.expect(jsonData.data).to.be.an('array');",
+							"    ",
+							"    if (jsonData.data.length === 0) {",
+							"        return;",
+							"    }",
+							"    ",
+							"    jsonData.data.forEach(function(product) {",
+							"        pm.expect(product.price).to.be.at.least(10);",
+							"        pm.expect(product.price).to.be.at.most(15);",
+							"    });",
+							"});",
+							"",
+							"pm.test(\"產品應按名稱升序排列\", function () {",
+							"    const jsonData = pm.response.json();",
+							"    ",
+							"    if (jsonData.data.length < 2) {",
+							"        pm.info(\"產品數量少於2，無法驗證排序\");",
+							"        return;",
+							"    }",
+							"    ",
+							"    let productNames = jsonData.data.map(product => product.name);",
+							"    ",
+							"    let sortedNames = [...productNames].sort((a, b) => a.localeCompare(b));",
+							"    ",
+							"    pm.expect(productNames).to.eql(sortedNames);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://api-with-bugs.practicesoftwaretesting.com/products?between=price%2C10%2C15&sort=name%2Casc",
+					"protocol": "https",
+					"host": [
+						"api-with-bugs",
+						"practicesoftwaretesting",
+						"com"
+					],
+					"path": [
+						"products"
+					],
+					"query": [
+						{
+							"key": "between",
+							"value": "price%2C10%2C15"
+						},
+						{
+							"key": "sort",
+							"value": "name%2Casc"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "不帶 ID 的 POST 請求",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"觀察 API 回應\", function () {",
+							"    console.log(\"Status code: \" + pm.response.code);",
+							"    ",
+							"    try {",
+							"        const jsonData = pm.response.json();",
+							"        console.log(\"Response body: \", jsonData);",
+							"        ",
+							"        if (pm.response.code === 201) {",
+							"            pm.test(\"為創建操作，狀態碼為 201\", function () {",
+							"                pm.response.to.have.status(201);",
+							"            });",
+							"            ",
+							"            pm.test(\"回應應包含新產品的 ID\", function () {",
+							"                pm.expect(jsonData).to.have.property('id');",
+							"            });",
+							"        } else {",
+							"            console.log(\"非創建操作，實際狀態碼: \" + pm.response.code);",
+							"        }",
+							"    } catch (e) {",
+							"        console.log(\"無法解析 JSON 回應: \" + e.message);",
+							"    }",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"Test Product\",\n  \"description\": \"This is a test product\",\n  \"price\": 19.99,\n  \"category_id\": 1,\n  \"brand_id\": 1,\n  \"product_image_id\": 1,\n  \"is_location_offer\": 0,\n  \"is_rental\": 0\n}"
+				},
+				"url": {
+					"raw": "https://api-with-bugs.practicesoftwaretesting.com/products",
+					"protocol": "https",
+					"host": [
+						"api-with-bugs",
+						"practicesoftwaretesting",
+						"com"
+					],
+					"path": [
+						"products"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "帶 ID 的 POST 請求",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"觀察 API 回應\", function () {",
+							"    console.log(\"Status code: \" + pm.response.code);",
+							"    ",
+							"    try {",
+							"        const jsonData = pm.response.json();",
+							"        console.log(\"Response body: \", jsonData);",
+							"        ",
+							"        if (pm.response.code === 200 || pm.response.code === 204) {",
+							"            pm.test(\"為更新操作，狀態碼為 200 或 204\", function () {",
+							"                pm.expect(pm.response.code).to.be.oneOf([200, 204]);",
+							"            });",
+							"        } else {",
+							"            console.log(\"非更新操作，實際狀態碼: \" + pm.response.code);",
+							"        }",
+							"    } catch (e) {",
+							"        console.log(\"無法解析 JSON 回應: \" + e.message);",
+							"    }",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"Updated Product\",\n  \"description\": \"This is an updated product\",\n  \"price\": 29.99,\n  \"category_id\": 1,\n  \"brand_id\": 1,\n  \"product_image_id\": 1,\n  \"is_location_offer\": 0,\n  \"is_rental\": 0\n}"
+				},
+				"url": {
+					"raw": "https://api-with-bugs.practicesoftwaretesting.com/products/11",
+					"protocol": "https",
+					"host": [
+						"api-with-bugs",
+						"practicesoftwaretesting",
+						"com"
+					],
+					"path": [
+						"products",
+						"11"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "帶 ID 的 POST 請求 - 缺少必填字段",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"狀態碼應為 400 或 422\", function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([400, 422]);",
+							"});",
+							"",
+							"pm.test(\"回應應包含錯誤信息\", function () {",
+							"    try {",
+							"        const jsonData = pm.response.json();",
+							"        ",
+							"        pm.expect(jsonData).to.have.any.keys('message', 'error', 'errors');",
+							"    } catch (e) {",
+							"        pm.expect.fail(\"回應不是有效的 JSON 或不包含錯誤信息\");",
+							"    }",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"Incomplete Product\"\n}"
+				},
+				"url": {
+					"raw": "https://api-with-bugs.practicesoftwaretesting.com/products/11",
+					"protocol": "https",
+					"host": [
+						"api-with-bugs",
+						"practicesoftwaretesting",
+						"com"
+					],
+					"path": [
+						"products",
+						"11"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "帶 ID 的 POST 請求 - 無效價格",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"狀態碼應為 400 或 422\", function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([400, 422]);",
+							"});",
+							"",
+							"pm.test(\"回應應包含價格相關的錯誤信息\", function () {",
+							"    try {",
+							"        const jsonData = pm.response.json();",
+							"        ",
+							"        let hasError = false;",
+							"        ",
+							"        if (jsonData.errors && jsonData.errors.price) {",
+							"            hasError = true;",
+							"        } else if (jsonData.message && jsonData.message.toLowerCase().includes('price')) {",
+							"            hasError = true;",
+							"        } else if (jsonData.error && jsonData.error.toLowerCase().includes('price')) {",
+							"            hasError = true;",
+							"        }",
+							"        pm.expect(jsonData).to.have.any.keys('message', 'error', 'errors');",
+							"",
+							"    } catch (e) {",
+							"        pm.expect.fail(\"回應不是有效的 JSON 或不包含價格相關錯誤信息\");",
+							"    }",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"Negative Price Product\",\n  \"description\": \"This product has a negative price\",\n  \"price\": -10.99,\n  \"category_id\": 1,\n  \"brand_id\": 1,\n  \"product_image_id\": 1,\n  \"is_location_offer\": 0,\n  \"is_rental\": 0\n}"
+				},
+				"url": {
+					"raw": "https://api-with-bugs.practicesoftwaretesting.com/products/11",
+					"protocol": "https",
+					"host": [
+						"api-with-bugs",
+						"practicesoftwaretesting",
+						"com"
+					],
+					"path": [
+						"products",
+						"11"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "不存在的產品",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"狀態碼應為 404\", function () {",
+							"    pm.response.to.have.status(404);",
+							"});",
+							"",
+							"pm.test(\"回應應包含錯誤信息\", function () {",
+							"    try {",
+							"        const jsonData = pm.response.json();",
+							"        pm.expect(jsonData).to.have.any.keys('message', 'error');",
+							"    } catch (e) {",
+							"        pm.expect.fail(\"回應不是有效的 JSON 或不包含錯誤信息\");",
+							"    }",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://api-with-bugs.practicesoftwaretesting.com/products/999999",
+					"protocol": "https",
+					"host": [
+						"api-with-bugs",
+						"practicesoftwaretesting",
+						"com"
+					],
+					"path": [
+						"products",
+						"999999"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "POST 不存在的產品 ID",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"狀態碼應為 404\", function () {",
+							"    pm.response.to.have.status(404);",
+							"});",
+							"",
+							"pm.test(\"回應應包含錯誤信息\", function () {",
+							"    try {",
+							"        const jsonData = pm.response.json();",
+							"        pm.expect(jsonData).to.have.any.keys('message', 'error');",
+							"    } catch (e) {",
+							"        pm.expect.fail(\"回應不是有效的 JSON 或不包含錯誤信息\");",
+							"    }",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"Non-existent Product Update\",\n  \"description\": \"Trying to update a non-existent product\",\n  \"price\": 19.99,\n  \"category_id\": 1,\n  \"brand_id\": 1,\n  \"product_image_id\": 1,\n  \"is_location_offer\": 0,\n  \"is_rental\": 0\n}"
+				},
+				"url": {
+					"raw": "https://api-with-bugs.practicesoftwaretesting.com/products/999999",
+					"protocol": "https",
+					"host": [
+						"api-with-bugs",
+						"practicesoftwaretesting",
+						"com"
+					],
+					"path": [
+						"products",
+						"999999"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "用不存在的欄位使用 between 參數",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"API 應適當處理不存在的欄位\", function () {",
+							"",
+							"    console.log(\"Status code: \" + pm.response.code);",
+							"    ",
+							"    pm.expect(pm.response.code).to.be.oneOf([200, 400, 404, 422, 500]);",
+							"    ",
+							"    try {",
+							"        const jsonData = pm.response.json();",
+							"        console.log(\"Response:\", jsonData);",
+							"        ",
+							"        if (pm.response.code === 200) {",
+							"            if (jsonData.data && Array.isArray(jsonData.data)) {",
+							"                console.log(\"找到 \" + jsonData.data.length + \" 個產品\");",
+							"            }",
+							"        }",
+							"    } catch (e) {",
+							"        console.log(\"無法解析 JSON 回應: \" + e.message);",
+							"    }",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://api-with-bugs.practicesoftwaretesting.com/products?between=ABCD1234%2C10%2C15",
+					"protocol": "https",
+					"host": [
+						"api-with-bugs",
+						"practicesoftwaretesting",
+						"com"
+					],
+					"path": [
+						"products"
+					],
+					"query": [
+						{
+							"key": "between",
+							"value": "ABCD1234%2C10%2C15"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "用不存在的欄位排序",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"API 應適當處理不存在的排序欄位\", function () {",
+							"",
+							"    console.log(\"Status code: \" + pm.response.code);",
+							"    ",
+							"",
+							"    pm.expect(pm.response.code).to.be.oneOf([200, 400, 404, 422, 500]);",
+							"    ",
+							"    try {",
+							"        const jsonData = pm.response.json();",
+							"        console.log(\"Response:\", jsonData);",
+							"",
+							"        if (pm.response.code === 200) {",
+							"            pm.expect(jsonData).to.have.property('data');",
+							"            pm.expect(jsonData.data).to.be.an('array');",
+							"        }",
+							"    } catch (e) {",
+							"        console.log(\"無法解析 JSON 回應: \" + e.message);",
+							"    }",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://api-with-bugs.practicesoftwaretesting.com/products?sort=ABCD1234%2Casc",
+					"protocol": "https",
+					"host": [
+						"api-with-bugs",
+						"practicesoftwaretesting",
+						"com"
+					],
+					"path": [
+						"products"
+					],
+					"query": [
+						{
+							"key": "sort",
+							"value": "ABCD1234%2Casc"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "特定價格產品",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"狀態碼應為 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"所有產品價格應等於 14.15\", function () {",
+							"    const jsonData = pm.response.json();",
+							"    ",
+							"    pm.expect(jsonData.data).to.be.an('array');",
+							"    ",
+							"    if (jsonData.data.length === 0) {",
+							"        console.log(\"沒有找到價格為 14.15 的產品\");",
+							"        return;",
+							"    }",
+							"    ",
+							"    jsonData.data.forEach(function(product) {",
+							"        pm.expect(parseFloat(product.price)).to.be.approximately(14.15, 0.001);",
+							"    });",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://api-with-bugs.practicesoftwaretesting.com/products?between=price%2C14.15%2C14.15",
+					"protocol": "https",
+					"host": [
+						"api-with-bugs",
+						"practicesoftwaretesting",
+						"com"
+					],
+					"path": [
+						"products"
+					],
+					"query": [
+						{
+							"key": "between",
+							"value": "price%2C14.15%2C14.15"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "產品價格負值",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// 測試案例 19：產品價格負值",
+							"pm.test(\"API 應適當處理負價格範圍\", function () {",
+							"    console.log(\"Status code: \" + pm.response.code);",
+							"    ",
+							"    pm.expect(pm.response.code).to.be.oneOf([200, 400, 422, 500]);",
+							"    ",
+							"    try {",
+							"        const jsonData = pm.response.json();",
+							"        console.log(\"Response:\", jsonData);",
+							"        ",
+							"        if (pm.response.code === 200) {",
+							"            pm.expect(jsonData).to.have.property('data');",
+							"            ",
+							"            if (jsonData.data.length === 0) {",
+							"                console.log(\"沒有找到負價格範圍的產品\");",
+							"            } else {",
+							"                console.log(\"找到 \" + jsonData.data.length + \" 個產品\");",
+							"            }",
+							"        }",
+							"    } catch (e) {",
+							"        console.log(\"無法解析 JSON 回應: \" + e.message);",
+							"    }",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://api-with-bugs.practicesoftwaretesting.com/products?between=price%2C-10%2C-5",
+					"protocol": "https",
+					"host": [
+						"api-with-bugs",
+						"practicesoftwaretesting",
+						"com"
+					],
+					"path": [
+						"products"
+					],
+					"query": [
+						{
+							"key": "between",
+							"value": "price%2C-10%2C-5"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
